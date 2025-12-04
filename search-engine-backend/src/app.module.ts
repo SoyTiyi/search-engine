@@ -5,9 +5,10 @@ import { AuthModule } from './auth/auth.module';
 import { FlightsController } from './flights/flights.controller';
 import { FlightsModule } from './flights/flights.module';
 import { ConfigurationModule } from './config/configutation.module';
+import { AmadeusModule } from './amadeus/amadeus.module';
 
 @Module({
-  imports: [AuthModule, FlightsModule, ConfigurationModule],
+  imports: [AuthModule, FlightsModule, ConfigurationModule, AmadeusModule],
   controllers: [AppController, FlightsController],
   providers: [AppService],
 })
