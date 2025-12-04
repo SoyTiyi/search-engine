@@ -1,66 +1,34 @@
-## Descripci�n
-
-<!-- Proporciona una descripci�n clara y concisa de los cambios realizados -->
+## Descripción
+<!-- Describe brevemente los cambios realizados -->
 
 ## Tipo de cambio
+- [ ] Bug fix
+- [ ] Nueva funcionalidad
+- [ ] Cambio que rompe compatibilidad
+- [ ] Actualización de documentación
 
-<!-- Marca con una 'x' la opci�n que aplique -->
-
-- [ ] Bug fix (correcci�n de un error)
-- [ ] Nueva funcionalidad (feature)
-- [ ] Cambio que rompe compatibilidad (breaking change)
-- [ ] Refactorizaci�n (sin cambios funcionales)
-- [ ] Mejora de documentaci�n
-- [ ] Actualizaci�n de dependencias
-- [ ] Mejora de rendimiento
-- [ ] Configuraci�n o infraestructura
-
-## Motivaci�n y contexto
-
-<!-- �Por qu� es necesario este cambio? �Qu� problema resuelve? -->
-<!-- Si est� relacionado con un issue, incluye el link: Fixes #123 -->
-
-## �C�mo ha sido probado?
-
-<!-- Describe las pruebas que realizaste para verificar tus cambios -->
-
-- [ ] Pruebas unitarias
-- [ ] Pruebas de integraci�n
-- [ ] Pruebas manuales
-- [ ] Pruebas end-to-end
-
-**Detalles de las pruebas:**
-<!-- Describe los casos de prueba ejecutados -->
-
-## Capturas de pantalla (si aplica)
-
-<!-- Agrega capturas de pantalla si los cambios afectan la UI o el comportamiento visible -->
+## ¿Cómo se ha probado?
+<!-- Describe las pruebas realizadas -->
 
 ## Checklist
-
-- [ ] Mi c�digo sigue las convenciones de estilo del proyecto
-- [ ] He realizado una auto-revisi�n de mi c�digo
-- [ ] He comentado mi c�digo, especialmente en �reas dif�ciles de entender
-- [ ] He actualizado la documentaci�n correspondiente
+- [ ] Mi código sigue las guías de estilo del proyecto
+- [ ] He realizado una auto-revisión de mi código
+- [ ] He comentado mi código en áreas difíciles de entender
+- [ ] He actualizado la documentación correspondiente
 - [ ] Mis cambios no generan nuevas advertencias
-- [ ] He agregado pruebas que demuestran que mi correcci�n es efectiva o que mi funcionalidad funciona
-- [ ] Las pruebas unitarias nuevas y existentes pasan localmente con mis cambios
-- [ ] He verificado que no existen conflictos con la rama base
+- [ ] He añadido pruebas que demuestran que mi corrección es efectiva
+```
 
-## Notas adicionales
+## Opción 2: Template en carpeta .github
 
-<!-- Cualquier informaci�n adicional que los revisores deban conocer -->
+Puedes crear el archivo en `.github/PULL_REQUEST_TEMPLATE.md` (esta es la ubicación más común y organizada).
 
-## Impacto
+## Opción 3: Múltiples templates
 
-<!-- Describe el impacto de estos cambios en el sistema -->
-
-- **Base de datos:** <!-- �Requiere migraciones? -->
-- **API:** <!-- �Hay cambios en endpoints o contratos? -->
-- **Configuraci�n:** <!-- �Se necesitan cambios en variables de entorno? -->
-- **Dependencias:** <!-- �Se agregaron o actualizaron dependencias? -->
-
-## Revisores sugeridos
-
-<!-- @menciona a los miembros del equipo que deber�an revisar este PR -->
-
+Si necesitas diferentes templates para distintos tipos de PRs, crea una carpeta:
+```
+.github/
+  PULL_REQUEST_TEMPLATE/
+    bug_fix.md
+    feature.md
+    documentation.md
