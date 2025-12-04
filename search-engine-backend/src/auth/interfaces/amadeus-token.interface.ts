@@ -1,4 +1,9 @@
 export interface AmadeusToken {
+    accessToken: string;
+    expiresIn: number;
+}
+
+export interface AmadeusTokenResponse {
     type: string;
     username: string;
     applicationName: string;
