@@ -1,19 +1,19 @@
-## Descripción
-<!-- Describe brevemente los cambios realizados -->
+## Description
+<!-- Provide a clear and concise description of the changes made -->
 
-## Tipo de cambio
+## Type of change
 - [ ] Bug fix
-- [ ] Nueva funcionalidad
-- [ ] Cambio que rompe compatibilidad
-- [ ] Actualización de documentación
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
 
-## ¿Cómo se ha probado?
-<!-- Describe las pruebas realizadas -->
+## How has this been tested?
+<!-- Describe the tests you ran to verify your changes -->
 
 ## Checklist
-- [ ] Mi código sigue las guías de estilo del proyecto
-- [ ] He realizado una auto-revisión de mi código
-- [ ] He comentado mi código en áreas difíciles de entender
-- [ ] He actualizado la documentación correspondiente
-- [ ] Mis cambios no generan nuevas advertencias
-- [ ] He añadido pruebas que demuestran que mi corrección es efectiva
+- [ ] My code follows the project's style guidelines
+- [ ] I have performed a self-review of my code
+- [ ] I have commented my code in hard-to-understand areas
+- [ ] I have updated the corresponding documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective
