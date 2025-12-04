@@ -4,7 +4,7 @@ import {
   ServerConfig,
   AmadeusConfig,
   FrontendConfig,
-} from './intefaces/config.interface';
+} from './interfaces/config.interface';
 
 @Injectable()
 export class ConfigurationService {
