@@ -27,7 +27,7 @@ export class AmadeusService {
       const url = new URL(`${this.baseUrl}${endpoint}`);
 
       const requestConfig = {
-        params: params,
+        params: this.sanitizeParams(params),
         headers: {
           Authorization: `Bearer ${token.accessToken}`,
           accept: 'application/json',
@@ -49,5 +49,28 @@ export class AmadeusService {
       console.error('Error occurred while making request:', error);
       throw error;
     }
+  }
+
+  private sanitizeParams(
+    params?: Record<string, any>,
+  ): Record<string, any> | undefined {
+    if (!params) {
+      return undefined;
+    }
+
+    const sanitized: Record<string, any> = {};
+
+    Object.keys(params).forEach((key) => {
+      const value = params[key];
+      if (value !== undefined && value !== null) {
+        sanitized[key] = value;
+      }
+    });
+
+    return Object.keys(sanitized).length > 0 ? sanitized : undefined;
+  }
+
+  private handleRequestError(error: any): void {
+    // Implement error handling logic specific to Amadeus API requests
   }
 }
