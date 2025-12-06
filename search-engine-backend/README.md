@@ -1,98 +1,131 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Flight Search Engine Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This repository contains the backend service for a flight search engine application. It is built using NestJS and integrates with the Amadeus Self-Service API to provide real-time flight offers and location search capabilities.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- **Flight Search:** Retrieves real-time flight offers including pricing, airline information, and flight duration.
+- **Location Search:** Provides autocomplete functionality for airports and cities based on IATA codes or keywords.
+- **Caching:** Implements in-memory caching to optimize response times and reduce external API calls.
+- **Error Handling:** Centralized exception handling and retry mechanisms for external API resilience.
+- **API Documentation:** Integrated Swagger UI for API exploration and testing.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tech Stack
 
-## Project setup
+- **Framework:** NestJS (Node.js)
+- **Language:** TypeScript
+- **External API:** Amadeus Self-Service API (v1 & v2)
+- **Caching:** cache-manager
+- **Validation:** class-validator, class-transformer
+- **HTTP Client:** @nestjs/axios
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+- Amadeus API Credentials (API Key and API Secret)
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone <repository-url>
+   cd search-engine-backend
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Configure environment variables:
+   Create a `.env` file in the root directory and add the following configuration:
+
+   ```env
+   PORT=3000
+
+   # Amadeus API Configuration
+   AMADEUS_API_KEY=your_api_key
+   AMADEUS_API_SECRET=your_api_secret
+   AMADEUS_BASE_URL=https://test.api.amadeus.com
+   AMADEUS_AUTH_BASE_URL=https://test.api.amadeus.com/v1/security/oauth2/token
+   AMADEUS_TIMEOUT=20000
+
+   # Front Configuration to allow request
+   FRONTEND_URL="http://localhost:3001"
+
+   # Cache Configuration
+   CACHE_TTL=300
+   CACHE_MAX=100
+   CACHE_TOKEN_TTL="1740"
+   ```
+
+## Running the Application
+
+### Development
 
 ```bash
-$ npm install
+npm run start:dev
 ```
 
-## Compile and run the project
+### Production
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run build
+npm run start:prod
 ```
 
-## Run tests
+The server will start on `http://localhost:3000` (or the port specified in `.env`).
 
-```bash
-# unit tests
-$ npm run test
+## API Documentation
 
-# e2e tests
-$ npm run test:e2e
+Once the application is running, you can access the Swagger documentation at:
 
-# test coverage
-$ npm run test:cov
+```
+http://localhost:3000/api
 ```
 
-## Deployment
+### Key Endpoints
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+#### 1. Search Flights
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Retrieves flight offers based on origin, destination, and date.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+- **Endpoint:** `GET /flights/search`
+- **Parameters:**
+  - `origin` (Required): 3-letter IATA code (e.g., MEX)
+  - `destination` (Required): 3-letter IATA code (e.g., MAD)
+  - `departureDate` (Required): YYYY-MM-DD (e.g., 2025-12-25)
+  - `maxPrice` (Optional): Maximum price filter.
+  - `nonStop` (Optional): Boolean to filter direct flights.
+
+#### 2. Search Locations
+
+Finds airports and cities matching a keyword.
+
+- **Endpoint:** `GET /flights/locations`
+- **Parameters:**
+  - `keyword` (Required): Search term (min 3 characters, e.g., "Lon").
+
+## Project Structure
+
 ```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+src/
+├── amadeus/           # Amadeus API integration service
+├── auth/              # Authentication handling for Amadeus
+├── cache/             # Caching configuration
+├── common/            # Global filters and utilities
+├── config/            # Environment configuration
+├── flights/           # Flight search logic and controllers
+│   ├── dto/           # Data Transfer Objects
+│   ├── interfaces/    # TypeScript interfaces
+│   ├── flights.controller.ts
+│   └── flights.service.ts
+└── main.ts            # Application entry point
+```
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is private and intended for evaluation purposes.
