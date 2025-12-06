@@ -1,4 +1,5 @@
 export interface AmadeusToken {
+    wasCached: boolean;
     accessToken: string;
     expiresIn: number;
 }

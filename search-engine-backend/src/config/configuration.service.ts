@@ -4,6 +4,7 @@ import {
   ServerConfig,
   AmadeusConfig,
   FrontendConfig,
+  CacheConfig,
 } from './interfaces/config.interface';
 
 @Injectable()
@@ -29,6 +30,14 @@ export class ConfigurationService {
   get frontend(): FrontendConfig {
     return {
       url: this.configService.get<string>('frontend.url') || '',
+    };
+  }
+
+  get cache(): CacheConfig {
+    return {
+      ttl: this.configService.get<number>('cache.ttl') || 0,
+      max: this.configService.get<number>('cache.max') || 0,
+      tokenTtl: this.configService.get<number>('cache.tokenTtl') || 0,
     };
   }
 }

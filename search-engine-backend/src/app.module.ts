@@ -4,10 +4,11 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { FlightsModule } from './flights/flights.module';
 import { ConfigurationModule } from './config/configutation.module';
-import { AmadeusModule } from './amadeus/amadeus.module';
+import { AmadeusModule } from './amadeus/amadeus.module';``
+import { CacheModule } from './cache/cache.module';
 
 @Module({
-  imports: [AuthModule, FlightsModule, ConfigurationModule, AmadeusModule],
+  imports: [AuthModule, FlightsModule, ConfigurationModule, AmadeusModule, CacheModule, CacheModule],
   controllers: [AppController],
   providers: [AppService],
 })
