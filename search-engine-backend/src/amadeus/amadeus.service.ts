@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigurationService } from 'src/config/configuration.service';
 import { AuthService } from 'src/auth/auth.service';
 import { firstValueFrom, catchError } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { AmadeusError } from './interfaces/amadeus.interfaces';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class AmadeusService {
@@ -47,7 +49,7 @@ export class AmadeusService {
       return response.data;
     } catch (error) {
       console.error('Error occurred while making request:', error);
-      throw error;
+      throw this.handleRequestError(error);
     }
   }
 
@@ -70,7 +72,79 @@ export class AmadeusService {
     return Object.keys(sanitized).length > 0 ? sanitized : undefined;
   }
 
-  private handleRequestError(error: any): void {
-    // Implement error handling logic specific to Amadeus API requests
+  private handleRequestError(
+    error: any,
+  ): void {
+
+    const axiosError = error as AxiosError<AmadeusError>;
+
+    throw this.buildHttpException(axiosError);
+  }
+
+  private buildHttpException(
+    error: AxiosError<AmadeusError>,
+  ): HttpException {
+    if (!error.response) {
+      return new HttpException(
+        'Unable to connect to Amadeus API',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
+
+    const status = error.response.status;
+    const errorData = error.response.data;
+
+    let message = 'Amadeus API error';
+    if (errorData?.errors && errorData.errors.length > 0) {
+      const firstError = errorData.errors[0];
+      message = firstError.detail || firstError.title || message;
+    }
+
+    switch (status) {
+      case 400:
+        return new HttpException(
+          `Bad request: ${message}`,
+          HttpStatus.BAD_REQUEST,
+        );
+
+      case 401:
+        return new HttpException(
+          'Unauthorized: Invalid API credentials',
+          HttpStatus.UNAUTHORIZED,
+        );
+
+      case 403:
+        return new HttpException(
+          'Forbidden: Access denied',
+          HttpStatus.FORBIDDEN,
+        );
+
+      case 404:
+        return new HttpException(
+          `Not found: ${message}`,
+          HttpStatus.NOT_FOUND,
+        );
+
+      case 429:
+        return new HttpException(
+          'Too many requests: Rate limit exceeded',
+          HttpStatus.TOO_MANY_REQUESTS,
+        );
+
+      case 500:
+      case 502:
+      case 503:
+      case 504:
+        return new HttpException(
+          'Amadeus API temporarily unavailable',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
+
+      default:
+        return new HttpException(
+          `Amadeus API error: ${message}`,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+    }
   }
 }
