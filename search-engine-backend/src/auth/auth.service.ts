@@ -48,9 +48,9 @@ export class AuthService {
         ),
     );
 
-    const { accessToken, expiresIn } = response.data;
+    const { access_token, expires_in } = response.data;
 
-    return { accessToken, expiresIn };
+    return { accessToken: access_token, expiresIn: expires_in };
   }
 
   private handleAuthError(error: AxiosError): void {

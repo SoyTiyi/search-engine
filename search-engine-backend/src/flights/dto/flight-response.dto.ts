@@ -14,44 +14,44 @@ export class FlightDestinationDto {
   destination: string;
 
   @ApiProperty({
-    example: 'Orly',
+    example: 'ORLY',
     description: 'Nombre detallado del aeropuerto de origen',
   })
   originName: string;
 
   @ApiProperty({
-    example: 'Adolfo Suarez Barajas',
+    example: 'ADOLFO SUAREZ BARAJAS',
     description: 'Nombre detallado del aeropuerto de destino',
   })
   destinationName: string;
 
   @ApiProperty({ 
     example: '2025-12-13', 
-    description: 'Fecha de salida (YYYY-MM-DD)' 
+    description: 'Fecha de salida en formato YYYY-MM-DD' 
   })
   departureDate: string;
 
   @ApiProperty({
     example: '2025-12-17',
-    description: 'Fecha de regreso (YYYY-MM-DD)',
+    description: 'Fecha de regreso en formato YYYY-MM-DD',
     required: false,
   })
   returnDate?: string;
 
   @ApiProperty({ 
     example: 118.68, 
-    description: 'Precio total del vuelo' 
+    description: 'Precio total del vuelo en la moneda especificada' 
   })
   price: number;
 
   @ApiProperty({ 
     example: 'EUR', 
-    description: 'Moneda del precio' 
+    description: 'Código de la moneda (ISO 4217)' 
   })
   currency: string;
 
   @ApiProperty({
-    description: 'Links relacionados para obtener más detalles',
+    description: 'Links para obtener más detalles sobre este vuelo',
     required: false,
     example: {
       flightDates: 'https://test.api.amadeus.com/v1/shopping/flight-dates?...',
@@ -80,7 +80,7 @@ export class FlightDestinationsResponseDto {
   @ApiProperty({
     example: {
       total: 24,
-      timestamp: '2025-12-04T10:30:00Z',
+      timestamp: '2025-12-04T10:30:00.000Z',
     },
     description: 'Metadata de la respuesta',
   })

@@ -27,9 +27,14 @@ export class AmadeusService {
     try {
       const token = await this.authService.getAccessToken();
       const url = new URL(`${this.baseUrl}${endpoint}`);
+      const sanitizedParams = this.sanitizeParams(params)
+
+      console.log('token', token);
+      console.log('url', url);
+      console.log('params', sanitizedParams);
 
       const requestConfig = {
-        params: this.sanitizeParams(params),
+        params: sanitizedParams,
         headers: {
           Authorization: `Bearer ${token.accessToken}`,
           accept: 'application/json',
