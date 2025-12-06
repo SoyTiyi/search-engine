@@ -6,49 +6,48 @@ import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AmadeusService {
-
-    private readonly baseUrl: string;
-    private readonly timeout: number;
+  private readonly baseUrl: string;
+  private readonly timeout: number;
 
   constructor(
     private configService: ConfigurationService,
     private authService: AuthService,
-    private httpService: HttpService,) {
+    private httpService: HttpService,
+  ) {
     this.baseUrl = this.configService.amadeus.baseUrl;
     this.timeout = this.configService.amadeus.timeout;
   }
 
   async makeRequest<T>(
     endpoint: string,
-    params? : Record<string, any>,
+    params?: Record<string, any>,
   ): Promise<T> {
     try {
-        const token = await this.authService.getAccessToken();
-        const url = new URL(`${this.baseUrl}${endpoint}`);
+      const token = await this.authService.getAccessToken();
+      const url = new URL(`${this.baseUrl}${endpoint}`);
 
-        const requestConfig = {
-            params: params,
-            headers: {
-                Authorization: `Bearer ${token.accessToken}`,
-                accept: 'application/json',
-            },
-            timeout: this.timeout,
-        }
+      const requestConfig = {
+        params: params,
+        headers: {
+          Authorization: `Bearer ${token.accessToken}`,
+          accept: 'application/json',
+        },
+        timeout: this.timeout,
+      };
 
-        const response = await firstValueFrom(
-            this.httpService
-            .get<T>(url.toString(), requestConfig).pipe(
-                catchError(error => {
-                    console.error('Error occurred while making request:', error);
-                    throw error;
-                }),
-            )
-        );
+      const response = await firstValueFrom(
+        this.httpService.get<T>(url.toString(), requestConfig).pipe(
+          catchError((error) => {
+            console.error('Error occurred while making request:', error);
+            throw error;
+          }),
+        ),
+      );
 
-        return response.data;
+      return response.data;
     } catch (error) {
-        console.error('Error occurred while making request:', error);
-        throw error;
+      console.error('Error occurred while making request:', error);
+      throw error;
     }
   }
 }
