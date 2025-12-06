@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { AmadeusService } from 'src/amadeus/amadeus.service';
 import { SearchFlightsDto } from './dto/search-flights.dto';
 import { FlightOfferDto, FlightOffersResponseDto } from './dto/flight-response.dto';
@@ -6,10 +8,15 @@ import { AmadeusFlightOffersResponse } from './interfaces/amadeus-flight.interfa
 import { SearchLocationDto } from './dto/search-location.dto';
 import { LocationDto, LocationResponseDto } from './dto/location-response.dto';
 import { AmadeusLocationsResponse } from './interfaces/amadeus-location.interface';
+import { SearchHistory } from './entities/search-history.entity';
 
 @Injectable()
 export class FlightsService {
-  constructor(private amadeusService: AmadeusService) {}
+  constructor(
+    private amadeusService: AmadeusService,
+    @InjectRepository(SearchHistory)
+    private searchHistoryRepository: Repository<SearchHistory>,
+  ) {}
 
   async searchFlights(searchFlightsDto: SearchFlightsDto): Promise<FlightOffersResponseDto> {
     const endpoint = '/v2/shopping/flight-offers';
@@ -17,7 +24,30 @@ export class FlightsService {
 
     const amadeusResponse = await this.amadeusService.makeRequest<AmadeusFlightOffersResponse>(endpoint, params);
     
-    return this.transformFlightOffers(amadeusResponse);
+    const response = this.transformFlightOffers(amadeusResponse);
+
+    this.saveSearchHistory(searchFlightsDto, response.meta.count).catch(err => 
+      console.error('Error saving search history:', err)
+    );
+
+    return response;
+  }
+
+  async getSearchHistory(): Promise<SearchHistory[]> {
+    return this.searchHistoryRepository.find({
+      order: { createdAt: 'DESC' },
+      take: 50
+    });
+  }
+
+  private async saveSearchHistory(dto: SearchFlightsDto, resultsCount: number) {
+    const history = this.searchHistoryRepository.create({
+      origin: dto.origin,
+      destination: dto.destination,
+      departureDate: dto.departureDate,
+      resultsCount: resultsCount,
+    });
+    await this.searchHistoryRepository.save(history);
   }
 
   async searchLocations(searchLocationDto: SearchLocationDto): Promise<LocationResponseDto> {
