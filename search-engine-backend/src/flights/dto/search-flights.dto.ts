@@ -11,30 +11,30 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class SearchFlightsDto {
   @ApiProperty({
-    description: 'Código IATA del aeropuerto de origen (3 letras)',
+    description: 'IATA code of the origin airport (3 letters)',
     example: 'PAR',
     required: true,
     minLength: 3,
     maxLength: 3,
   })
   @IsString()
-  @Length(3, 3, { message: 'El código de origen debe tener exactamente 3 caracteres' })
+  @Length(3, 3, { message: 'Origin code must be exactly 3 characters' })
   origin: string;
 
   @ApiProperty({
-    description: 'Precio máximo del vuelo en EUR',
+    description: 'Maximum flight price in EUR',
     example: 200,
     required: false,
     minimum: 0,
   })
   @IsOptional()
   @IsNumber()
-  @Min(0, { message: 'El precio máximo debe ser mayor o igual a 0' })
+  @Min(0, { message: 'Maximum price must be greater than or equal to 0' })
   @Type(() => Number)
   maxPrice?: number;
 
   @ApiProperty({
-    description: 'Fecha de salida en formato YYYY-MM-DD o rango YYYY-MM-DD,YYYY-MM-DD',
+    description: 'Departure date in YYYY-MM-DD format or range YYYY-MM-DD,YYYY-MM-DD',
     example: '2025-12-05',
     required: false,
   })
@@ -43,7 +43,7 @@ export class SearchFlightsDto {
   departureDate?: string;
 
   @ApiProperty({
-    description: 'Tipo de vista de resultados',
+    description: 'Results view type',
     example: 'DESTINATION',
     required: false,
     enum: ['DATE', 'DURATION', 'COUNTRY', 'DESTINATION'],
@@ -53,7 +53,7 @@ export class SearchFlightsDto {
   viewBy?: string;
 
   @ApiProperty({
-    description: 'Duración del viaje en días (rango)',
+    description: 'Trip duration in days (range)',
     example: '1,15',
     required: false,
   })
@@ -62,7 +62,7 @@ export class SearchFlightsDto {
   duration?: string;
 
   @ApiProperty({
-    description: 'Solo vuelos directos (sin escalas)',
+    description: 'Direct flights only (no stopovers)',
     example: false,
     required: false,
   })
@@ -71,7 +71,7 @@ export class SearchFlightsDto {
   nonStop?: boolean;
 
   @ApiProperty({
-    description: 'Solo vuelos de ida',
+    description: 'One-way flights only',
     example: false,
     required: false,
   })

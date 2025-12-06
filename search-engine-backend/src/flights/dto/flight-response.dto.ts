@@ -1,57 +1,57 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class FlightDestinationDto {
-  @ApiProperty({ 
-    example: 'ORY', 
-    description: 'Código IATA del aeropuerto de origen' 
+  @ApiProperty({
+    example: 'ORY',
+    description: 'IATA code of the origin airport'
   })
   origin: string;
 
-  @ApiProperty({ 
-    example: 'MAD', 
-    description: 'Código IATA del aeropuerto de destino' 
+  @ApiProperty({
+    example: 'MAD',
+    description: 'IATA code of the destination airport'
   })
   destination: string;
 
   @ApiProperty({
     example: 'ORLY',
-    description: 'Nombre detallado del aeropuerto de origen',
+    description: 'Detailed name of the origin airport',
   })
   originName: string;
 
   @ApiProperty({
     example: 'ADOLFO SUAREZ BARAJAS',
-    description: 'Nombre detallado del aeropuerto de destino',
+    description: 'Detailed name of the destination airport',
   })
   destinationName: string;
 
-  @ApiProperty({ 
-    example: '2025-12-13', 
-    description: 'Fecha de salida en formato YYYY-MM-DD' 
+  @ApiProperty({
+    example: '2025-12-13',
+    description: 'Departure date in YYYY-MM-DD format'
   })
   departureDate: string;
 
   @ApiProperty({
     example: '2025-12-17',
-    description: 'Fecha de regreso en formato YYYY-MM-DD',
+    description: 'Return date in YYYY-MM-DD format',
     required: false,
   })
   returnDate?: string;
 
-  @ApiProperty({ 
-    example: 118.68, 
-    description: 'Precio total del vuelo en la moneda especificada' 
+  @ApiProperty({
+    example: 118.68,
+    description: 'Total flight price in the specified currency'
   })
   price: number;
 
-  @ApiProperty({ 
-    example: 'EUR', 
-    description: 'Código de la moneda (ISO 4217)' 
+  @ApiProperty({
+    example: 'EUR',
+    description: 'Currency code (ISO 4217)'
   })
   currency: string;
 
   @ApiProperty({
-    description: 'Links para obtener más detalles sobre este vuelo',
+    description: 'Links to get more details about this flight',
     required: false,
     example: {
       flightDates: 'https://test.api.amadeus.com/v1/shopping/flight-dates?...',
@@ -65,15 +65,15 @@ export class FlightDestinationDto {
 }
 
 export class FlightDestinationsResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: true,
-    description: 'Indica si la petición fue exitosa' 
+    description: 'Indicates if the request was successful'
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     type: [FlightDestinationDto],
-    description: 'Lista de destinos de vuelo disponibles' 
+    description: 'List of available flight destinations'
   })
   data: FlightDestinationDto[];
 
@@ -82,7 +82,7 @@ export class FlightDestinationsResponseDto {
       total: 24,
       timestamp: '2025-12-04T10:30:00.000Z',
     },
-    description: 'Metadata de la respuesta',
+    description: 'Response metadata',
   })
   meta: {
     total: number;
