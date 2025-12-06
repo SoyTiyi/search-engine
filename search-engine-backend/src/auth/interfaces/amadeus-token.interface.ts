@@ -6,11 +6,11 @@ export interface AmadeusToken {
 export interface AmadeusTokenResponse {
     type: string;
     username: string;
-    applicationName: string;
-    clientId: string;
-    tokenType: string;
-    accessToken: string;
-    expiresIn: number;
+    application_name: string;
+    client_id: string;
+    token_type: string;
+    access_token: string;
+    expires_in: number;
     state: string;
     scope: string;
 }
