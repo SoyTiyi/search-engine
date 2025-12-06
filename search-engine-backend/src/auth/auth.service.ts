@@ -44,6 +44,7 @@ export class AuthService {
     const cachedToken = await this.getCachedToken();
 
     if (cachedToken) {
+      console.log('Using cached access token');
       return { accessToken: cachedToken, expiresIn: 0, wasCached: true };
     }
 
@@ -64,6 +65,8 @@ export class AuthService {
     );
 
     const { access_token, expires_in } = response.data;
+
+    console.log('Access token retrieved successfully');
 
     await this.cacheToken(access_token, expires_in);
 
@@ -122,8 +125,19 @@ export class AuthService {
         metadata,
         ttlMilliseconds,
       );
+
+      console.log('Access token cached successfully');
     } catch (error) {
       console.error('Error caching token:', error);
+    }
+  }
+
+  async invalidateToken(): Promise<void> {
+    try {
+      await this.cacheManager.del(this.TOKEN_CACHE_KEY);
+      await this.cacheManager.del(this.TOKEN_METADATA_KEY);
+    } catch (error) {
+      console.error('Error invalidating token:', error);
     }
   }
 
