@@ -29,10 +29,6 @@ export class AmadeusService {
       const url = new URL(`${this.baseUrl}${endpoint}`);
       const sanitizedParams = this.sanitizeParams(params)
 
-      console.log('token', token);
-      console.log('url', url);
-      console.log('params', sanitizedParams);
-
       const requestConfig = {
         params: sanitizedParams,
         headers: {
