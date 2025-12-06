@@ -19,3 +19,10 @@ export interface CacheConfig {
     max: number;
     tokenTtl: number;
 }
+
+export interface RedisConfig {
+    host: string;
+    port: number;
+    password?: string;
+    db: number;
+}
