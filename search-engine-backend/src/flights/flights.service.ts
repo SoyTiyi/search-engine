@@ -3,6 +3,9 @@ import { AmadeusService } from 'src/amadeus/amadeus.service';
 import { SearchFlightsDto } from './dto/search-flights.dto';
 import { FlightOfferDto, FlightOffersResponseDto } from './dto/flight-response.dto';
 import { AmadeusFlightOffersResponse } from './interfaces/amadeus-flight.interface';
+import { SearchLocationDto } from './dto/search-location.dto';
+import { LocationDto, LocationResponseDto } from './dto/location-response.dto';
+import { AmadeusLocationsResponse } from './interfaces/amadeus-location.interface';
 
 @Injectable()
 export class FlightsService {
@@ -15,6 +18,35 @@ export class FlightsService {
     const amadeusResponse = await this.amadeusService.makeRequest<AmadeusFlightOffersResponse>(endpoint, params);
     
     return this.transformFlightOffers(amadeusResponse);
+  }
+
+  async searchLocations(searchLocationDto: SearchLocationDto): Promise<LocationResponseDto> {
+    const endpoint = '/v1/reference-data/locations';
+    const params = {
+      subType: 'CITY,AIRPORT',
+      keyword: searchLocationDto.keyword,
+      'page[limit]': 10,
+      view: 'LIGHT'
+    };
+
+    const amadeusResponse = await this.amadeusService.makeRequest<AmadeusLocationsResponse>(endpoint, params);
+    
+    return this.transformLocations(amadeusResponse);
+  }
+
+  private transformLocations(data: AmadeusLocationsResponse): LocationResponseDto {
+    const locations: LocationDto[] = data.data.map((location) => ({
+      iataCode: location.iataCode,
+      name: location.name,
+      detailedName: location.detailedName,
+      subType: location.subType,
+      countryName: location.address?.countryName || '',
+    }));
+
+    return {
+      success: true,
+      data: locations,
+    };
   }
 
   private transformFlightOffers(data: AmadeusFlightOffersResponse): FlightOffersResponseDto {
@@ -59,9 +91,9 @@ export class FlightsService {
       originLocationCode: searchDto.origin.toUpperCase(),
       destinationLocationCode: searchDto.destination.toUpperCase(),
       departureDate: searchDto.departureDate,
-      adults: 1,
+      adults: searchDto.adults || 1,
       max: 10,
-      currencyCode: 'USD'
+      currencyCode: searchDto.currencyCode || 'EUR',
     };
 
     if (searchDto.maxPrice) {

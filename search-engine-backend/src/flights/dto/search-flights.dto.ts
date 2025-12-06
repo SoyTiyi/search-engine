@@ -88,4 +88,24 @@ export class SearchFlightsDto {
   @IsOptional()
   @Type(() => Boolean)
   oneWay?: boolean;
+
+  @ApiProperty({
+    description: 'Number of adults',
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(1, { message: 'At least one adult must be specified' })
+  @Type(() => Number)
+  adults?: number;
+
+  @ApiProperty({
+    description: 'Currency code',
+    example: 'USD',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  currencyCode?: string;
 }
