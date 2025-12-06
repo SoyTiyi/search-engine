@@ -22,6 +22,17 @@ export class SearchFlightsDto {
   origin: string;
 
   @ApiProperty({
+    description: 'IATA code of the destination airport (3 letters)',
+    example: 'MAR',
+    required: true,
+    minLength: 3,
+    maxLength: 3,
+  })
+  @IsString()
+  @Length(3, 3, { message: 'Destination code must be exactly 3 characters' })
+  destination: string;
+
+  @ApiProperty({
     description: 'Maximum flight price in EUR',
     example: 200,
     required: false,
@@ -34,13 +45,12 @@ export class SearchFlightsDto {
   maxPrice?: number;
 
   @ApiProperty({
-    description: 'Departure date in YYYY-MM-DD format or range YYYY-MM-DD,YYYY-MM-DD',
+    description: 'Departure date in YYYY-MM-DD format',
     example: '2025-12-05',
-    required: false,
+    required: true,
   })
-  @IsOptional()
   @IsString()
-  departureDate?: string;
+  departureDate: string;
 
   @ApiProperty({
     description: 'Results view type',
