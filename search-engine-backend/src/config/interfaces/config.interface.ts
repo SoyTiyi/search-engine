@@ -13,3 +13,9 @@ export interface AmadeusConfig {
 export interface FrontendConfig {
     url: string;
 }
+
+export interface CacheConfig {
+    ttl: number;
+    max: number;
+    tokenTtl: number;
+}

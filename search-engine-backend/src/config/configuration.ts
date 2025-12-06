@@ -11,5 +11,10 @@ export default () => ({
     },
     frontend: {
         url: process.env.FRONTEND_URL || 'http://localhost:3001',
+    },
+    cache: {
+        ttl: process.env.CACHE_TTL ? parseInt(process.env.CACHE_TTL, 10) : 1800,
+        max: process.env.CACHE_MAX ? parseInt(process.env.CACHE_MAX, 10) : 100,
+        tokenTtl: process.env.CACHE_TOKEN_TTL ? parseInt(process.env.CACHE_TOKEN_TTL, 10) : 1740,
     }
 });
