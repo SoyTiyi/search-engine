@@ -1,43 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import { Header } from './components/Header';
 import { SearchForm } from './components/SearchForm';
-import { FlightCard, FlightOffer } from './components/FlightCard';
+import { FlightCard } from './components/FlightCard';
+import { useSearch } from './hooks/useSearch';
 
 export default function Home() {
-  const [offers, setOffers] = useState<FlightOffer[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSearch = async (origin: string, destination: string, date: string) => {
-    setLoading(true);
-    setError('');
-    setSearched(true);
-    setOffers([]);
-
-    try {
-      const url = new URL('http://localhost:3000/flights/search');
-      url.searchParams.append('origin', origin);
-      url.searchParams.append('destination', destination);
-      url.searchParams.append('departureDate', date);
-
-      const response = await fetch(url.toString());
-      const data = await response.json();
-
-      if (data.success) {
-        setOffers(data.data);
-      } else {
-        setError('Failed to fetch flights. Please try again.');
-      }
-    } catch (err) {
-      console.error(err);
-      setError('An error occurred while searching for flights.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { offers, loading, searched, error, handleSearch } = useSearch();
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -59,7 +28,10 @@ export default function Home() {
         </div>
 
         <div className="px-4 mb-12">
-          <SearchForm onSearch={handleSearch} isLoading={loading} />
+          <SearchForm
+            onSearch={(origin, destination, departureDate) => handleSearch({ origin, destination, departureDate })}
+            isLoading={loading}
+          />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
