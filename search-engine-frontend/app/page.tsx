@@ -53,7 +53,7 @@ export default function Home() {
               Find your next <span className="text-brand-teal">adventure</span>
             </h1>
             <p className="text-blue-50 text-xl max-w-2xl mx-auto font-medium">
-              Search deals on flights, hotels, and much more.
+              Search deals on flights
             </p>
           </div>
         </div>
