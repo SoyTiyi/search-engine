@@ -1,91 +1,58 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class FlightDestinationDto {
-  @ApiProperty({ 
-    example: 'ORY', 
-    description: 'Código IATA del aeropuerto de origen' 
-  })
+export class FlightOfferDto {
+  @ApiProperty({ example: 'flight-offer' })
+  type: string;
+
+  @ApiProperty({ example: '1' })
+  id: string;
+
+  @ApiProperty({ example: 'MEX' })
   origin: string;
 
-  @ApiProperty({ 
-    example: 'MAD', 
-    description: 'Código IATA del aeropuerto de destino' 
-  })
+  @ApiProperty({ example: 'MAD' })
   destination: string;
 
-  @ApiProperty({
-    example: 'ORLY',
-    description: 'Nombre detallado del aeropuerto de origen',
-  })
-  originName: string;
+  @ApiProperty({ example: 'Aeromexico' })
+  airline: string;
 
-  @ApiProperty({
-    example: 'ADOLFO SUAREZ BARAJAS',
-    description: 'Nombre detallado del aeropuerto de destino',
-  })
-  destinationName: string;
+  @ApiProperty({ example: 'AM1' })
+  flight_number: string;
 
-  @ApiProperty({ 
-    example: '2025-12-13', 
-    description: 'Fecha de salida en formato YYYY-MM-DD' 
-  })
+  @ApiProperty({ example: '2025-12-25T18:00:00' })
   departureDate: string;
 
-  @ApiProperty({
-    example: '2025-12-17',
-    description: 'Fecha de regreso en formato YYYY-MM-DD',
-    required: false,
-  })
-  returnDate?: string;
+  @ApiProperty({ example: '2025-12-26T12:00:00' })
+  arrivalDate: string;
 
-  @ApiProperty({ 
-    example: 118.68, 
-    description: 'Precio total del vuelo en la moneda especificada' 
-  })
+  @ApiProperty({ example: 'PT10H' })
+  duration: string;
+
+  @ApiProperty({ example: 850.50 })
   price: number;
 
-  @ApiProperty({ 
-    example: 'EUR', 
-    description: 'Código de la moneda (ISO 4217)' 
-  })
+  @ApiProperty({ example: 'USD' })
   currency: string;
 
-  @ApiProperty({
-    description: 'Links para obtener más detalles sobre este vuelo',
-    required: false,
-    example: {
-      flightDates: 'https://test.api.amadeus.com/v1/shopping/flight-dates?...',
-      flightOffers: 'https://test.api.amadeus.com/v2/shopping/flight-offers?...',
-    },
-  })
-  links?: {
-    flightDates?: string;
-    flightOffers?: string;
-  };
+  @ApiProperty({ example: 9 })
+  numberOfBookableSeats: number;
 }
 
-export class FlightDestinationsResponseDto {
-  @ApiProperty({ 
-    example: true,
-    description: 'Indica si la petición fue exitosa' 
-  })
+export class FlightOffersResponseDto {
+  @ApiProperty({ example: true })
   success: boolean;
 
-  @ApiProperty({ 
-    type: [FlightDestinationDto],
-    description: 'Lista de destinos de vuelo disponibles' 
-  })
-  data: FlightDestinationDto[];
+  @ApiProperty({ type: [FlightOfferDto] })
+  data: FlightOfferDto[];
 
   @ApiProperty({
     example: {
-      total: 24,
-      timestamp: '2025-12-04T10:30:00.000Z',
+      count: 10,
+      timestamp: '2025-12-06T10:00:00.000Z',
     },
-    description: 'Metadata de la respuesta',
   })
   meta: {
-    total: number;
+    count: number;
     timestamp: string;
   };
 }

@@ -1,87 +1,137 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { AmadeusService } from 'src/amadeus/amadeus.service';
 import { SearchFlightsDto } from './dto/search-flights.dto';
-import { FlightDestinationDto, FlightDestinationsResponseDto } from './dto/flight-response.dto';
-import { AmadeusFlightDestinationsResponse } from './interfaces/amadeus-flight.interface';
+import { FlightOfferDto, FlightOffersResponseDto } from './dto/flight-response.dto';
+import { AmadeusFlightOffersResponse } from './interfaces/amadeus-flight.interface';
+import { SearchLocationDto } from './dto/search-location.dto';
+import { LocationDto, LocationResponseDto } from './dto/location-response.dto';
+import { AmadeusLocationsResponse } from './interfaces/amadeus-location.interface';
+import { SearchHistory } from './entities/search-history.entity';
 
 @Injectable()
 export class FlightsService {
-  constructor(private amadeusService: AmadeusService) {}
+  constructor(
+    private amadeusService: AmadeusService,
+    @InjectRepository(SearchHistory)
+    private searchHistoryRepository: Repository<SearchHistory>,
+  ) {}
 
-  async searchFlights(
-    searchFlightsDto: SearchFlightsDto,
-  ): Promise<FlightDestinationsResponseDto> {
-    const endpoint = '/shopping/flight-destinations';
-    const params = this.buildDestinationsParams(searchFlightsDto);
+  async searchFlights(searchFlightsDto: SearchFlightsDto): Promise<FlightOffersResponseDto> {
+    const endpoint = '/v2/shopping/flight-offers';
+    const params = this.buildFlightOffersParams(searchFlightsDto);
 
-    const amadeusResponse = await this.amadeusService.makeRequest<
-      AmadeusFlightDestinationsResponse
-    >(endpoint, params);
+    const amadeusResponse = await this.amadeusService.makeRequest<AmadeusFlightOffersResponse>(endpoint, params);
     
-    const flights = this.transformToFlightDestinationsResponse(amadeusResponse);
+    const response = this.transformFlightOffers(amadeusResponse);
 
-    return {
-      success: true,
-      data: flights,
-      meta: {
-        total: flights.length,
-        timestamp: new Date().toISOString(),
-      },
-    };
+    this.saveSearchHistory(searchFlightsDto, response.meta.count).catch(err => 
+      console.error('Error saving search history:', err)
+    );
+
+    return response;
   }
 
-  private transformToFlightDestinationsResponse(
-    amadeusData: AmadeusFlightDestinationsResponse,
-  ): FlightDestinationDto[] {
-    return amadeusData.data.map((flight) => {
-      const originLocation = amadeusData.dictionaries.locations[flight.origin];
-      const destinationLocation =
-        amadeusData.dictionaries.locations[flight.destination];
-
-      return {
-        origin: flight.origin,
-        destination: flight.destination,
-        originName: originLocation?.detailedName || flight.origin,
-        destinationName: destinationLocation?.detailedName || flight.destination,
-        departureDate: flight.departureDate,
-        returnDate: flight.returnDate,
-        price: parseFloat(flight.price.total),
-        currency: amadeusData.meta.currency,
-        links: flight.links,
-      };
+  async getSearchHistory(): Promise<SearchHistory[]> {
+    return this.searchHistoryRepository.find({
+      order: { createdAt: 'DESC' },
+      take: 50
     });
   }
 
+  private async saveSearchHistory(dto: SearchFlightsDto, resultsCount: number) {
+    const history = this.searchHistoryRepository.create({
+      origin: dto.origin,
+      destination: dto.destination,
+      departureDate: dto.departureDate,
+      resultsCount: resultsCount,
+    });
+    await this.searchHistoryRepository.save(history);
+  }
 
-  private buildDestinationsParams(
-    searchDto: SearchFlightsDto,
-  ): Record<string, any> {
-    const params: Record<string, any> = {
-      origin: searchDto.origin.toUpperCase(),
+  async searchLocations(searchLocationDto: SearchLocationDto): Promise<LocationResponseDto> {
+    const endpoint = '/v1/reference-data/locations';
+    const params = {
+      subType: 'CITY,AIRPORT',
+      keyword: searchLocationDto.keyword,
+      'page[limit]': 10,
+      view: 'LIGHT'
     };
 
-    if (searchDto.maxPrice !== undefined) {
-      params.maxPrice = searchDto.maxPrice;
+    const amadeusResponse = await this.amadeusService.makeRequest<AmadeusLocationsResponse>(endpoint, params);
+    
+    return this.transformLocations(amadeusResponse);
+  }
+
+  private transformLocations(data: AmadeusLocationsResponse): LocationResponseDto {
+    const locations: LocationDto[] = data.data.map((location) => ({
+      iataCode: location.iataCode,
+      name: location.name,
+      detailedName: location.detailedName,
+      subType: location.subType,
+      countryName: location.address?.countryName || '',
+    }));
+
+    return {
+      success: true,
+      data: locations,
+    };
+  }
+
+  private transformFlightOffers(data: AmadeusFlightOffersResponse): FlightOffersResponseDto {
+    const carriers = data.dictionaries?.carriers || {};
+
+    const offers: FlightOfferDto[] = data.data.map((offer) => {
+      const itinerary = offer.itineraries[0];
+      const segments = itinerary.segments;
+      
+      const firstSegment = segments[0];
+      const lastSegment = segments[segments.length - 1];
+      const carrierCode = firstSegment.carrierCode;
+
+      return {
+        type: 'flight-offer',
+        id: offer.id,
+        origin: firstSegment.departure.iataCode,
+        destination: lastSegment.arrival.iataCode,
+        airline: carriers[carrierCode] || carrierCode,
+        flight_number: `${carrierCode}${firstSegment.number}`,
+        departureDate: firstSegment.departure.at,
+        arrivalDate: lastSegment.arrival.at,
+        duration: itinerary.duration,
+        price: parseFloat(offer.price.total),
+        currency: offer.price.currency,
+        numberOfBookableSeats: offer.numberOfBookableSeats,
+      };
+    });
+
+    return {
+      success: true,
+      data: offers,
+      meta: {
+        count: data.meta?.count || offers.length,
+        timestamp: new Date().toISOString()
+      }
+    };
+  }
+
+  private buildFlightOffersParams(searchDto: SearchFlightsDto): Record<string, any> {
+    const params: Record<string, any> = {
+      originLocationCode: searchDto.origin.toUpperCase(),
+      destinationLocationCode: searchDto.destination.toUpperCase(),
+      departureDate: searchDto.departureDate,
+      adults: searchDto.adults || 1,
+      max: 10,
+      currencyCode: searchDto.currencyCode || 'EUR',
+    };
+
+    if (searchDto.maxPrice) {
+      params.maxPrice = Math.floor(searchDto.maxPrice);
     }
 
-    if (searchDto.departureDate) {
-      params.departureDate = searchDto.departureDate;
-    }
-
-    if (searchDto.viewBy) {
-      params.viewBy = searchDto.viewBy;
-    }
-
-    if (searchDto.duration) {
-      params.duration = searchDto.duration;
-    }
-
-    if (searchDto.nonStop !== undefined) {
+    if (searchDto.nonStop) {
       params.nonStop = searchDto.nonStop;
-    }
-
-    if (searchDto.oneWay !== undefined) {
-      params.oneWay = searchDto.oneWay;
     }
 
     return params;

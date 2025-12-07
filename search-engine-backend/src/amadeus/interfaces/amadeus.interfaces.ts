@@ -11,3 +11,8 @@ export interface AmadeusError {
     };
   }>;
 }
+
+export interface CachedToken{
+  expires_at: Date;
+  created_at: Date;
+}
