@@ -8,6 +8,7 @@ import { ConfigurationModule } from './config/configutation.module';
 import { AmadeusModule } from './amadeus/amadeus.module';
 import { CacheModule } from './cache/cache.module';
 import { SearchHistory } from './flights/entities/search-history.entity';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SearchHistory } from './flights/entities/search-history.entity';
     ConfigurationModule,
     AmadeusModule,
     CacheModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
