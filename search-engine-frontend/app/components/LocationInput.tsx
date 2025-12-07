@@ -1,80 +1,22 @@
-import { useState, useEffect, useRef } from 'react';
+import { LocationInputProps } from '../lib/type';
 import { MapPin, Plane } from 'lucide-react';
-import { debounce } from '../lib/utils';
-
-export interface Location {
-  iataCode: string;
-  name: string;
-  detailedName: string;
-  subType: string;
-  countryName: string;
-}
-
-interface LocationInputProps {
-  label: string;
-  placeholder: string;
-  value: Location | null;
-  onChange: (location: Location) => void;
-  icon?: React.ReactNode;
-}
+import useLocations from '../hooks/useLocations';
 
 export function LocationInput({ label, placeholder, value, onChange, icon }: LocationInputProps) {
-  const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<Location[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const {
+    query,
+    suggestions,
+    isOpen,
+    wrapperRef,
+    setIsOpen,
+    handleInputChange,
+    handleSelect: handleSelectLocation
+  } = useLocations(value);
 
-  useEffect(() => {
-    if (value) {
-      setQuery(`${value.name} (${value.iataCode})`);
-    }
-  }, [value]);
-
-  const fetchLocations = async (keyword: string) => {
-    if (!keyword || keyword.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await fetch(`http://localhost:3000/flights/locations?keyword=${encodeURIComponent(keyword)}`);
-      const data = await response.json();
-      if (data.success) {
-        setSuggestions(data.data);
-        setIsOpen(true);
-      }
-    } catch (error) {
-      console.error('Error fetching locations:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const debouncedFetch = debounce(fetchLocations, 300);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setQuery(newValue);
-    debouncedFetch(newValue);
-  };
-
-  const handleSelect = (location: Location) => {
+  const handleSelect = (location: typeof suggestions[0]) => {
     onChange(location);
-    setQuery(`${location.name} (${location.iataCode})`);
-    setIsOpen(false);
+    handleSelectLocation(location);
   };
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [wrapperRef]);
 
   return (
     <div className="relative flex-1" ref={wrapperRef}>
@@ -99,9 +41,9 @@ export function LocationInput({ label, placeholder, value, onChange, icon }: Loc
 
       {isOpen && suggestions.length > 0 && (
         <div className="absolute z-50 w-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 max-h-80 overflow-y-auto">
-          {suggestions.map((location) => (
+          {suggestions.map((location, index) => (
             <button
-              key={location.iataCode}
+              key={`${location.iataCode}-${index}`}
               className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-3 border-b border-gray-50 last:border-0"
               onClick={() => handleSelect(location)}
             >

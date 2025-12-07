@@ -1,28 +1,19 @@
-import { useState } from 'react';
 import { Calendar, Search, ArrowRightLeft } from 'lucide-react';
-import { LocationInput, Location } from './LocationInput';
-
-interface SearchFormProps {
-  onSearch: (origin: string, destination: string, date: string) => void;
-  isLoading?: boolean;
-}
+import { SearchFormProps } from '../lib/type';
+import { LocationInput } from './LocationInput';
+import { useSearchForm } from '../hooks/useSearchForm';
 
 export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
-  const [origin, setOrigin] = useState<Location | null>(null);
-  const [destination, setDestination] = useState<Location | null>(null);
-  const [date, setDate] = useState('');
-
-  const handleSearch = () => {
-    if (origin && destination && date) {
-      onSearch(origin.iataCode, destination.iataCode, date);
-    }
-  };
-
-  const handleSwap = () => {
-    const temp = origin;
-    setOrigin(destination);
-    setDestination(temp);
-  };
+  const {
+    origin,
+    setOrigin,
+    destination,
+    setDestination,
+    date,
+    setDate,
+    handleSearch,
+    handleSwap
+  } = useSearchForm(onSearch);
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 max-w-5xl mx-auto -mt-24 relative z-10">
