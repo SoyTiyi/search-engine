@@ -1,12 +1,16 @@
 # Flight Search Engine Backend
 
-This repository contains the backend service for a flight search engine application. It is built using NestJS and integrates with the Amadeus Self-Service API to provide real-time flight offers and location search capabilities.
+This repository contains the backend service for a flight search engine tech challenge. It is built using NestJS and integrates with the Amadeus Self-Service API to provide real-time flight offers, location search capabilities, and search history tracking.
 
 ## Features
 
 - **Flight Search:** Retrieves real-time flight offers including pricing, airline information, and flight duration.
 - **Location Search:** Provides autocomplete functionality for airports and cities based on IATA codes or keywords.
+- **Search History:** Persists user search queries using a SQLite database.
 - **Caching:** Implements in-memory caching to optimize response times and reduce external API calls.
+- **Rate Limiting:** Protects the API from abuse with global request throttling.
+- **Health Checks:** Provides system health status monitoring.
+- **Docker Support:** Fully containerized application for easy deployment.
 - **Error Handling:** Centralized exception handling and retry mechanisms for external API resilience.
 - **API Documentation:** Integrated Swagger UI for API exploration and testing.
 
@@ -14,7 +18,9 @@ This repository contains the backend service for a flight search engine applicat
 
 - **Framework:** NestJS (Node.js)
 - **Language:** TypeScript
+- **Database:** SQLite with TypeORM
 - **External API:** Amadeus Self-Service API (v1 & v2)
+- **Containerization:** Docker & Docker Compose
 - **Caching:** cache-manager
 - **Validation:** class-validator, class-transformer
 - **HTTP Client:** @nestjs/axios
@@ -23,6 +29,7 @@ This repository contains the backend service for a flight search engine applicat
 
 - Node.js (v18 or higher)
 - npm or yarn
+- Docker & Docker Compose (Optional, for containerized execution)
 - Amadeus API Credentials (API Key and API Secret)
 
 ## Installation
@@ -41,7 +48,7 @@ This repository contains the backend service for a flight search engine applicat
    ```
 
 3. Configure environment variables:
-   Create a `.env` file in the root directory and add the following configuration:
+   Create a `.env` file in the root directory (you can use `.env.example` as a reference):
 
    ```env
    PORT=3000
@@ -53,31 +60,47 @@ This repository contains the backend service for a flight search engine applicat
    AMADEUS_AUTH_BASE_URL=https://test.api.amadeus.com/v1/security/oauth2/token
    AMADEUS_TIMEOUT=20000
 
-   # Front Configuration to allow request
+   # Frontend Configuration
    FRONTEND_URL="http://localhost:3001"
 
    # Cache Configuration
-   CACHE_TTL=300
+   CACHE_TTL=1800
    CACHE_MAX=100
-   CACHE_TOKEN_TTL="1740"
+   CACHE_TOKEN_TTL=1740
+
+   # Database Configuration (Optional)
+   DB_PATH=search-engine.sqlite
    ```
 
 ## Running the Application
 
-### Development
+### Using Docker (Recommended)
+
+The easiest way to run the application is using Docker Compose. This will set up the API and handle the database persistence automatically.
+
+1. Ensure your `.env` file is configured.
+2. Run the following command:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+The application will be available at `http://localhost:3000`.
+
+### Manual Execution
+
+#### Development
 
 ```bash
 npm run start:dev
 ```
 
-### Production
+#### Production
 
 ```bash
 npm run build
 npm run start:prod
 ```
-
-The server will start on `http://localhost:3000` (or the port specified in `.env`).
 
 ## API Documentation
 
@@ -90,42 +113,37 @@ http://localhost:3000/api
 ### Key Endpoints
 
 #### 1. Search Flights
-
 Retrieves flight offers based on origin, destination, and date.
-
 - **Endpoint:** `GET /flights/search`
-- **Parameters:**
-  - `origin` (Required): 3-letter IATA code (e.g., MEX)
-  - `destination` (Required): 3-letter IATA code (e.g., MAD)
-  - `departureDate` (Required): YYYY-MM-DD (e.g., 2025-12-25)
-  - `maxPrice` (Optional): Maximum price filter.
-  - `nonStop` (Optional): Boolean to filter direct flights.
+- **Parameters:** `origin`, `destination`, `departureDate`, `returnDate` (optional), `adults` (optional).
 
-#### 2. Search Locations
-
+#### 2. Location Search
 Finds airports and cities matching a keyword.
-
 - **Endpoint:** `GET /flights/locations`
-- **Parameters:**
-  - `keyword` (Required): Search term (min 3 characters, e.g., "Lon").
+- **Parameters:** `keyword` (e.g., "Lon").
+
+#### 3. Search History
+Retrieves the history of performed searches.
+- **Endpoint:** `GET /flights/history`
+
+#### 4. Health Check
+Checks the status of the application.
+- **Endpoint:** `GET /health`
 
 ## Project Structure
 
 ```
 src/
-├── amadeus/           # Amadeus API integration service
-├── auth/              # Authentication handling for Amadeus
-├── cache/             # Caching configuration
-├── common/            # Global filters and utilities
-├── config/            # Environment configuration
-├── flights/           # Flight search logic and controllers
-│   ├── dto/           # Data Transfer Objects
-│   ├── interfaces/    # TypeScript interfaces
-│   ├── flights.controller.ts
-│   └── flights.service.ts
-└── main.ts            # Application entry point
+├── amadeus/       # Integration with Amadeus API
+├── auth/          # Authentication logic (if applicable)
+├── cache/         # Caching configuration
+├── common/        # Shared filters, guards, and interceptors
+├── config/        # Environment configuration
+├── flights/       # Flight search logic, controllers, and DTOs
+│   ├── dto/       # Data Transfer Objects
+│   ├── entities/  # Database entities (SearchHistory)
+│   └── interfaces/# TypeScript interfaces
+├── health/        # Health check module
+├── app.module.ts  # Root module
+└── main.ts        # Application entry point
 ```
-
-## License
-
-This project is private and intended for evaluation purposes.
