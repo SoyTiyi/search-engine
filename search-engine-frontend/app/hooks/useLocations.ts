@@ -43,7 +43,7 @@ export default function useLocations(initialValue?: Location | null) {
         }
     };
 
-    const debouncedFetch = useCallback(debounce(fetchLocations, 300), []);
+    const debouncedFetch = useCallback(debounce(fetchLocations, 600), []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;

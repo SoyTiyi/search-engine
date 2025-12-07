@@ -1,24 +1,6 @@
-import { Plane, Clock, Luggage } from 'lucide-react';
+import { Plane, Luggage } from 'lucide-react';
 import { formatDuration, formatTime, formatCurrency } from '../lib/utils';
-
-export interface FlightOffer {
-  type: string;
-  id: string;
-  origin: string;
-  destination: string;
-  airline: string;
-  flight_number: string;
-  departureDate: string;
-  arrivalDate: string;
-  duration: string;
-  price: number;
-  currency: string;
-  numberOfBookableSeats: number;
-}
-
-interface FlightCardProps {
-  offer: FlightOffer;
-}
+import { FlightCardProps } from '../lib/type';
 
 export function FlightCard({ offer }: FlightCardProps) {
   return (
