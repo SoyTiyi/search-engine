@@ -21,4 +21,9 @@ export class FlightsController {
     async searchLocations(@Query() searchLocationDto: SearchLocationDto): Promise<LocationResponseDto> {
         return this.flightsService.searchLocations(searchLocationDto);
     }
+
+    @Get('history')
+    async getHistory() {
+        return this.flightsService.getSearchHistory();
+    }
 }
