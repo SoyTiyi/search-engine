@@ -42,6 +42,15 @@ export interface FlightOffer {
     price: number;
     currency: string;
     numberOfBookableSeats: number;
+    originalOffer?: Record<string, unknown>;
+}
+
+export interface ConfirmedPrice {
+    flightOffers?: Array<{
+        price?: {
+            total?: string;
+        };
+    }>;
 }
 
 export interface FlightCardProps {

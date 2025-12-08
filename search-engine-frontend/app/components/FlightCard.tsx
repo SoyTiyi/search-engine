@@ -2,7 +2,7 @@ import { Plane, Luggage } from 'lucide-react';
 import { formatDuration, formatTime, formatCurrency } from '../lib/utils';
 import { FlightCardProps } from '../lib/type';
 
-export function FlightCard({ offer }: FlightCardProps) {
+export function FlightCard({ offer, onSelect }: FlightCardProps & { onSelect?: () => void }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200 mb-4">
       <div className="flex flex-col md:flex-row justify-between items-center gap-6">
@@ -48,7 +48,10 @@ export function FlightCard({ offer }: FlightCardProps) {
             <p className="text-sm text-gray-500">per passenger</p>
           </div>
           
-          <button className="w-full md:w-auto bg-brand-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-brand-blue transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+          <button
+            onClick={onSelect}
+            className="w-full md:w-auto bg-brand-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-brand-blue transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+          >
             Select
           </button>
         </div>

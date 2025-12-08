@@ -6,7 +6,6 @@ import { HeaderLink } from '../lib/type';
 
 const linkProperties: HeaderLink[] = [
   { href: '/', label: 'Flights', pathname: '/' },
-  { href: '/flight-detail', label: 'Flight Detail', pathname: '/flight-detail' },
   { href: '/history', label: 'History', pathname: '/history' }
 ]
 
