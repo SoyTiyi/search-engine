@@ -22,7 +22,6 @@ describe('AmadeusService', () => {
   const mockToken = { accessToken: 'test-token-123' };
 
   beforeAll(() => {
-    // Silenciar console.error y console.log durante TODOS los tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'log').mockImplementation(() => {});
   });
@@ -388,7 +387,6 @@ describe('AmadeusService', () => {
 
       expect(thrownError).toBeDefined();
       expect(thrownError?.getStatus()).toBe(HttpStatus.SERVICE_UNAVAILABLE);
-      // 1 inicial + 3 retries = 4 llamadas
       expect(httpService.get).toHaveBeenCalledTimes(4);
     });
 
