@@ -150,7 +150,6 @@ export class AuthService {
     }
 
     const status = error.response.status;
-    const data = error.response.data as any;
 
     switch (status) {
       case 400:

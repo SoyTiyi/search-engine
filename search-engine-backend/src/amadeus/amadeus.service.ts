@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { ConfigurationService } from 'src/config/configuration.service';
-import { AuthService } from 'src/auth/auth.service';
+import { ConfigurationService } from '../config/configuration.service';
+import { AuthService } from '../auth/auth.service';
 import { firstValueFrom, catchError } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { AmadeusError } from './interfaces/amadeus.interfaces';
@@ -53,7 +53,7 @@ export class AmadeusService {
       return response.data;
     } catch (error) {
       console.error('Error occurred while making request:', error);
-      throw this.handleRequestError(error, endpoint, params || {}, retryCount);
+      return this.handleRequestError(error, endpoint, params || {}, retryCount);
     }
   }
 
