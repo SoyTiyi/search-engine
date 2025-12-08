@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./search-engine-backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_PATH=/usr/src/app/data/search-engine.sqlite
+      - AMADEUS_API_KEY=${AMADEUS_API_KEY}
+      - AMADEUS_API_SECRET=${AMADEUS_API_SECRET}
+      - AMADEUS_BASE_URL=${AMADEUS_BASE_URL:-https://test.api.amadeus.com}
+      - AMADEUS_AUTH_BASE_URL=${AMADEUS_AUTH_BASE_URL:-https://test.api.amadeus.com/v1/security/oauth2/token}
+      - AMADEUS_TIMEOUT=${AMADEUS_TIMEOUT:-20000}
+      - FRONTEND_URL=http://localhost:3001
+    volumes:
+      - backend_data:/usr/src/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - flight-search-network
+
+  frontend:
+    build:
+      context: ./search-engine-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - BACKEND_URL=http://backend:3000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - flight-search-network
+
+volumes:
+  backend_data:
+    driver: local
+
+networks:
+  flight-search-network:
+    driver: bridge
