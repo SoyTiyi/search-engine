@@ -4,11 +4,12 @@ import { Repository } from 'typeorm';
 import { AmadeusService } from 'src/amadeus/amadeus.service';
 import { SearchFlightsDto } from './dto/search-flights.dto';
 import { FlightOfferDto, FlightOffersResponseDto } from './dto/flight-response.dto';
-import { AmadeusFlightOffersResponse } from './interfaces/amadeus-flight.interface';
+import { AmadeusFlightOffer, AmadeusFlightOffersResponse } from './interfaces/amadeus-flight.interface';
 import { SearchLocationDto } from './dto/search-location.dto';
 import { LocationDto, LocationResponseDto } from './dto/location-response.dto';
 import { AmadeusLocationsResponse } from './interfaces/amadeus-location.interface';
 import { SearchHistory } from './entities/search-history.entity';
+import { AmadeusPriceResponse } from './interfaces/amadeus-price.interface';
 
 @Injectable()
 export class FlightsService {
@@ -38,6 +39,24 @@ export class FlightsService {
       order: { createdAt: 'DESC' },
       take: 50
     });
+  }
+
+  async getFlightPrice(flightOffer: AmadeusFlightOffer): Promise<any> {
+    const endpoint = '/v1/shopping/flight-offers/pricing';
+
+    const body = {
+      data: {
+        type: 'flight-offers-pricing',
+        flightOffers: [flightOffer]
+      }
+    };
+
+    const amadeusResponse = await this.amadeusService.makePostRequest<AmadeusPriceResponse>(endpoint, body);
+
+    return {
+      success: true,
+      data: amadeusResponse.data
+    };
   }
 
   private async saveSearchHistory(dto: SearchFlightsDto, resultsCount: number) {
@@ -85,7 +104,7 @@ export class FlightsService {
     const offers: FlightOfferDto[] = data.data.map((offer) => {
       const itinerary = offer.itineraries[0];
       const segments = itinerary.segments;
-      
+
       const firstSegment = segments[0];
       const lastSegment = segments[segments.length - 1];
       const carrierCode = firstSegment.carrierCode;
@@ -103,6 +122,7 @@ export class FlightsService {
         price: parseFloat(offer.price.total),
         currency: offer.price.currency,
         numberOfBookableSeats: offer.numberOfBookableSeats,
+        originalOffer: offer,
       };
     });
 

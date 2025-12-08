@@ -1,10 +1,11 @@
-import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body, UseInterceptors } from '@nestjs/common';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { FlightsService } from './flights.service';
 import { SearchFlightsDto } from './dto/search-flights.dto';
 import { FlightOffersResponseDto } from './dto/flight-response.dto';
 import { SearchLocationDto } from './dto/search-location.dto';
 import { LocationResponseDto } from './dto/location-response.dto';
+import { FlightPriceRequestDto } from './dto/flight-price.dto';
 
 @Controller('flights')
 export class FlightsController {
@@ -25,5 +26,10 @@ export class FlightsController {
     @Get('history')
     async getHistory() {
         return this.flightsService.getSearchHistory();
+    }
+
+    @Post('price')
+    async getFlightPrice(@Body() flightPriceDto: FlightPriceRequestDto) {
+        return this.flightsService.getFlightPrice(flightPriceDto.flightOffer);
     }
 }
