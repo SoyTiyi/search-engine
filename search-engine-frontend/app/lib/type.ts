@@ -53,3 +53,13 @@ export interface FlightSearchRequest {
     destination: string;
     departureDate: string;
 }
+
+export interface SearchHistory {
+    id: string;
+    origin: string;
+    destination: string;
+    departureDate: string;
+    returnDate: string | null;
+    resultsCount: number;
+    createdAt: string;
+}

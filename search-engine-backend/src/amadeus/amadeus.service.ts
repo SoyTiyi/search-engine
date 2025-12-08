@@ -57,6 +57,40 @@ export class AmadeusService {
     }
   }
 
+  async makePostRequest<T>(
+    endpoint: string,
+    body: Record<string, any>,
+    retryCount = 0,
+  ): Promise<T> {
+    try {
+      const token = await this.authService.getAccessToken();
+      const url = `${this.baseUrl}${endpoint}`;
+
+      const requestConfig = {
+        headers: {
+          Authorization: `Bearer ${token.accessToken}`,
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        timeout: this.timeout,
+      };
+
+      const response = await firstValueFrom(
+        this.httpService.post<T>(url, body, requestConfig).pipe(
+          catchError((error) => {
+            console.error('Error occurred while making POST request:', error);
+            throw error;
+          }),
+        ),
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred while making POST request:', error);
+      return this.handlePostRequestError(error, endpoint, body, retryCount);
+    }
+  }
+
   private sanitizeParams(
     params?: Record<string, any>,
   ): Record<string, any> | undefined {
@@ -95,6 +129,30 @@ export class AmadeusService {
       await this.sleep(Math.pow(2, retryCount) * 100);
 
       return this.makeRequest<T>(endpoint, params, retryCount + 1);
+    }
+
+    throw this.buildHttpException(axiosError);
+  }
+
+  private async handlePostRequestError<T>(
+    error: any,
+    endpoint: string,
+    body: Record<string, any>,
+    retryCount = 0
+  ): Promise<T> {
+
+    const axiosError = error as AxiosError<AmadeusError>;
+    const status = error.response?.status;
+
+    if (this.shouldRetry(status, retryCount)) {
+      console.log(`Retrying POST request to ${endpoint}. Attempt ${retryCount + 1}`);
+      if (status === 401 || status === 403) {
+        await this.authService.invalidateToken();
+      }
+
+      await this.sleep(Math.pow(2, retryCount) * 100);
+
+      return this.makePostRequest<T>(endpoint, body, retryCount + 1);
     }
 
     throw this.buildHttpException(axiosError);

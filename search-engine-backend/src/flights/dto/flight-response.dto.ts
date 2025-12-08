@@ -36,6 +36,12 @@ export class FlightOfferDto {
 
   @ApiProperty({ example: 9 })
   numberOfBookableSeats: number;
+
+  @ApiProperty({
+    description: 'Original Amadeus flight offer object for price confirmation',
+    required: false
+  })
+  originalOffer?: any;
 }
 
 export class FlightOffersResponseDto {
