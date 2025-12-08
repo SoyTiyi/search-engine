@@ -1,65 +1,115 @@
-import Image from "next/image";
+'use client';
+
+import { Header } from './components/Header';
+import { SearchForm } from './components/SearchForm';
+import { FlightCard } from './components/FlightCard';
+import { useSearch } from './hooks/useSearch';
 
 export default function Home() {
+  const { offers, loading, searched, error, handleSearch } = useSearch();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header />
+      
+      <main className="flex-grow">
+        <div className="bg-gradient-to-br from-brand-primary to-brand-blue pb-32 pt-20 px-4 relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-brand-teal opacity-10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-brand-teal opacity-10 rounded-full blur-3xl"></div>
+          
+          <div className="max-w-7xl mx-auto text-center relative z-10">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-tight">
+              Find your next <span className="text-brand-teal">adventure</span>
+            </h1>
+            <p className="text-blue-50 text-xl max-w-2xl mx-auto font-medium">
+              Search deals on flights
+            </p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="px-4 mb-12">
+          <SearchForm
+            onSearch={(origin, destination, departureDate) => handleSearch({ origin, destination, departureDate })}
+            isLoading={loading}
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-8 text-center">
+              {error}
+            </div>
+          )}
+
+          {loading && (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-xl p-6 h-48 animate-pulse border border-gray-200">
+                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!loading && searched && offers.length === 0 && !error && (
+            <div className="text-center py-12">
+              <div className="bg-white rounded-full p-4 inline-block mb-4 shadow-sm">
+                <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900">No flights found</h3>
+              <p className="text-gray-500 mt-1">Try adjusting your search dates or locations.</p>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {offers.map((offer) => (
+              <FlightCard key={offer.id} offer={offer} />
+            ))}
+          </div>
         </div>
       </main>
+
+      <footer className="bg-white border-t border-gray-200 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h4 className="font-bold text-gray-900 mb-4">Deal Engine</h4>
+              <p className="text-gray-500 text-sm">
+                Digital transformation for the travel industry.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-900 mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li><a href="#" className="hover:text-brand-teal">About Us</a></li>
+                <li><a href="#" className="hover:text-brand-teal">Careers</a></li>
+                <li><a href="#" className="hover:text-brand-teal">Blog</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-900 mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li><a href="#" className="hover:text-brand-teal">Help Center</a></li>
+                <li><a href="#" className="hover:text-brand-teal">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-brand-teal">Privacy Policy</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-900 mb-4">Contact</h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li>info@deal-engine.com</li>
+                <li>Miami, FL</li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8 pt-8 border-t border-gray-100 text-center text-sm text-gray-400">
+            © {new Date().getFullYear()} Deal Engine. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
