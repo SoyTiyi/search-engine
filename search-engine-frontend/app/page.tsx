@@ -1,27 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import { Header } from './components/Header';
 import { SearchForm } from './components/SearchForm';
 import { FlightCard } from './components/FlightCard';
-import { BookingModal } from './components/BookingModal';
 import { useSearch } from './hooks/useSearch';
-import { FlightOffer } from './lib/type';
 
 export default function Home() {
   const { offers, loading, searched, error, handleSearch } = useSearch();
-  const [selectedFlight, setSelectedFlight] = useState<FlightOffer | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleSelectFlight = (flight: FlightOffer) => {
-    setSelectedFlight(flight);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedFlight(null);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -81,23 +66,11 @@ export default function Home() {
 
           <div className="space-y-4">
             {offers.map((offer) => (
-              <FlightCard
-                key={offer.id}
-                offer={offer}
-                onSelect={() => handleSelectFlight(offer)}
-              />
+              <FlightCard key={offer.id} offer={offer} />
             ))}
           </div>
         </div>
       </main>
-
-      {selectedFlight && (
-        <BookingModal
-          flight={selectedFlight}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-        />
-      )}
 
       <footer className="bg-white border-t border-gray-200 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

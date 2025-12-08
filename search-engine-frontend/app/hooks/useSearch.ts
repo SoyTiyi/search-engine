@@ -28,7 +28,7 @@ export function useSearch() {
             if (data.success) {
                 setOffers(data.data);
             } else {
-                setError('Not flights found for the given search criteria.');
+                setError('Failed to fetch flights. Please try again.');
             }
         } catch (error) {
             setError('An error occurred while searching for flights.');

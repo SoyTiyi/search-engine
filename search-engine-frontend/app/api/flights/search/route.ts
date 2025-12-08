@@ -17,11 +17,7 @@ export async function POST(request: NextRequest) {
         const data = await response.json();
 
         if (response.ok) {
-            const offersWithOriginal = data.data.map((offer: Record<string, unknown>) => ({
-                ...offer,
-                originalOffer: offer.originalOffer || offer
-            }));
-            return NextResponse.json({ success: true, data: offersWithOriginal });
+            return NextResponse.json({ success: true, data: data.data });
         } else {
             return NextResponse.json(
                 { success: false, message: data.message || "Failed to fetch flight offers" },
