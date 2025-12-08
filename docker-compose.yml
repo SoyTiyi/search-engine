@@ -16,7 +16,7 @@ services:
       - AMADEUS_BASE_URL=${AMADEUS_BASE_URL:-https://test.api.amadeus.com}
       - AMADEUS_AUTH_BASE_URL=${AMADEUS_AUTH_BASE_URL:-https://test.api.amadeus.com/v1/security/oauth2/token}
       - AMADEUS_TIMEOUT=${AMADEUS_TIMEOUT:-20000}
-      - FRONTEND_URL=http://localhost:3001
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3001}
     volumes:
       - backend_data:/usr/src/app/data
     restart: unless-stopped
